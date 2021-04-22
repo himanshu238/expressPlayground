@@ -6,27 +6,32 @@ app.use(express.urlencoded({extended:true}))
 app.set('view engine','ejs')
 app.set('views',path.join(__dirname,'views'))
 
+const { v4: uuidv4 } = require('uuid');
+uuidv4();
 
 
 const comments = [
     {
+        id:1,
         username:'Dante',
-        comment:'cocky'
+        comment:'This is first comment'
     },
     {
-    username:'Dante111',
-    comment:'cocky111'
+        id:2,
+        username:'Dante111',
+        comment:'This is the second comment by 111'
     },
     {
-    username:'Dante2222',
-    comment:'cocky333'
+        id:3,
+        username:'Dante2222',
+        comment:'This is the third in the list by 222'
     }
 ];
 
 
 
 app.get('/comments', (req,res)=>{
-    res.render('comments/index',{comments})
+    res.render('comments/index',{comments});
 })
 
 app.get('/comments/new',(req,res)=>{
@@ -34,15 +39,30 @@ app.get('/comments/new',(req,res)=>{
 })
 
 app.post('/comments',(req,res)=>{
-    const {username, comment} = req.body;
-    comments.push({username,comment})
+    const {username, comment,id} = req.body;
+    comments.push({username,comment,id});
+    res.redirect('/comments');
+})
+
+app.get('/comments/:id',(req,res)=>{
+    const {id} = req.params;
+    const comment = comments.find(c=>c.id == parseInt(id));
+    res.render('comments/show',{comment});
+})
+
+app.patch('/comments/:id',(req,res)=>{
+    const {id} = req.params;
+    const newComment = req.body.comment;
+    console.log(req.body)
+    const foundComment = comments.find(c=>c.id == parseInt(id));
+    foundComment.comment = newComment;
     res.redirect('/comments')
 })
 
 app.get('*',(req,res)=>{
-    res.send(`this is wrong page!! mf run`)
+    res.send(`this is wrong page!! mf run`);
 })
 
 app.listen(3000,()=> {
-    console.log("Port 3000 live")
+    console.log("Port 3000 live");
 })
